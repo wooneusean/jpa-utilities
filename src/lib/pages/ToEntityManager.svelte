@@ -1,26 +1,15 @@
 <script lang="ts">
     import { Row, Column, TextArea, Button, CodeSnippet } from 'carbon-components-svelte';
-    import { createEventDispatcher } from 'svelte';
-    import { generatePojo } from '../ddl/ddl-to-pojo';
+    // import { createEventDispatcher } from 'svelte';
+    import { generateEm } from '../ddl/ddl-to-em';
 
-    let includeJPAAnnotations = true;
-    let includeLombokAnnotations = true;
     let ddl = '';
     let em = '';
 
-    const dispatch = createEventDispatcher();
+    // const dispatch = createEventDispatcher();
 
     const handleProcessClicked = () => {
-        try {
-            let { pojo: generated, warning } = generatePojo(ddl, { includeJPAAnnotations, includeLombokAnnotations });
-
-            em = generated;
-            if (warning !== '') {
-                dispatch('message', { message: warning, type: 'warning' });
-            }
-        } catch (error) {
-            dispatch('message', { message: error.message, type: 'error' });
-        }
+        em = generateEm(ddl);
     };
 </script>
 

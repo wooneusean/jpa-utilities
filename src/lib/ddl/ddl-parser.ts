@@ -152,7 +152,7 @@ export const getTableInfo = (ddlString: string): JPATable => {
     const columnRegExp = /(?:`|)([\w\d]+?)(?:`|)\s(\w+?)((?:\(\d+(?:,\d+|)\))|)\s(.+?)(?:,|(?:[\n\r]|)\))/gim;
 
     const columnList = [];
-    let columnMatch;
+    let columnMatch: RegExpExecArray;
     do {
         columnMatch = columnRegExp.exec(ddlString);
         if (columnMatch) {
