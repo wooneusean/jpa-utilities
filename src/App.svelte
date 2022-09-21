@@ -1,10 +1,29 @@
 <script lang="ts">
-    import { Header, SkipToContent, Content, SideNav, SideNavItems, SideNavLink } from 'carbon-components-svelte';
-    import ToEntityManager from './lib/ToEntityManager.svelte';
-    import ToPojo from './lib/ToPojo.svelte';
+    import {
+        Header,
+        SkipToContent,
+        Content,
+        SideNav,
+        SideNavItems,
+        SideNavMenu,
+        SideNavMenuItem,
+        Grid,
+        ToastNotification,
+    } from 'carbon-components-svelte';
+    import type { ToastMessage } from './lib/ddl/jpa-types';
+    import ToEntityManager from './lib/pages/ToEntityManager.svelte';
+    import ToPojo from './lib/pages/ToPojo.svelte';
+    import { capitalize } from './lib/utilities';
 
     let isSideNavOpen = false;
     let currentPage = 0;
+
+    let messages: ToastMessage[] = [];
+
+    let handleMessage = (message: CustomEvent<ToastMessage>) => {
+        messages.push(message.detail);
+        messages = messages;
+    };
 </script>
 
 <Header company="JPA" platformName="Utilities" bind:isSideNavOpen>
@@ -15,15 +34,43 @@
 
 <SideNav bind:isOpen={isSideNavOpen}>
     <SideNavItems>
-        <SideNavLink text="DDL to JPA POJO" on:click={() => (currentPage = 0)} />
-        <SideNavLink text="DDL to EntityManager Insert" on:click={() => (currentPage = 1)} />
+        <SideNavMenu expanded={true} text="Generators">
+            <SideNavMenuItem text="POJO" on:click={() => (currentPage = 0)} />
+            <SideNavMenuItem text="EntityManager Statements" on:click={() => (currentPage = 1)} />
+        </SideNavMenu>
     </SideNavItems>
 </SideNav>
 
 <Content>
-    {#if currentPage == 0}
-        <ToPojo />
-    {:else}
-        <ToEntityManager />
-    {/if}
+    <Grid>
+        {#if currentPage == 0}
+            <ToPojo on:message={handleMessage} />
+        {:else}
+            <ToEntityManager on:message={handleMessage} />
+        {/if}
+    </Grid>
 </Content>
+<div class="bottom-right">
+    {#each messages as message}
+        <ToastNotification
+            kind={message.type}
+            on:close={() => {
+                const ix = messages.indexOf(message);
+                messages.splice(ix, 1);
+            }}
+            timeout={5000}
+            title={capitalize(message.type)}
+            subtitle={message.message}
+            caption={new Date().toLocaleString()}
+        />
+    {/each}
+</div>
+
+<style>
+    .bottom-right {
+        position: absolute;
+        right: 1rem;
+        bottom: 1rem;
+        z-index: 10;
+    }
+</style>
