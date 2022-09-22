@@ -9,3 +9,14 @@ export const toCamelCase = (input: string): string => {
         }
     }, '');
 };
+
+export const toSpaceCase = (input: string): string => {
+    return (
+        input
+            .replace(/([A-Z])/g, ' $1')
+            // uppercase the first character
+            .replace(/^./, function (str) {
+                return str.toUpperCase();
+            })
+    );
+};
