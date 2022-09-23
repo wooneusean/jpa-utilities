@@ -1,6 +1,6 @@
 import { capitalize, toCamelCase } from '../utilities';
 import { getTableInfo } from './ddl-parser';
-import type { JPAField } from './jpa-types';
+import type { JPAField, JPATable } from './jpa-types';
 
 const generateJpaString = (jpaField: JPAField, includeJPAAnnotations: boolean = true): string => {
     const fieldDetails = [];
@@ -49,12 +49,10 @@ interface DDLToPOJOOptions {
 }
 
 export const generatePojo = (
-    ddl: string,
+    jpaTable: JPATable = null,
     options: DDLToPOJOOptions = { includeJPAAnnotations: true, includeLombokAnnotations: true }
 ): { pojo: string; warning: string } => {
     // max length 4194304
-
-    const jpaTable = getTableInfo(ddl);
 
     // Move primary key to the top
     const jpaColumnsString = jpaTable.columns
@@ -94,7 +92,7 @@ ${jpaColumnsString}
         pojo,
         warning:
             jpaTable.columns.length > 60
-                ? `Tables with a large amount of columns may cause problems due to certain databases' query length limits.`
+                ? `Tables with a large amount of columns may cause problems due to certain databases' query length limits. Consider selecting only the needed columns to avoid this problem.`
                 : '',
     };
 };

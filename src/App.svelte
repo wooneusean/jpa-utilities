@@ -54,11 +54,7 @@
     {#each messages as message}
         <ToastNotification
             kind={message.type}
-            on:close={() => {
-                const ix = messages.indexOf(message);
-                messages.splice(ix, 1);
-            }}
-            timeout={5000}
+            timeout={10000}
             title={capitalize(message.type)}
             subtitle={message.message}
             caption={new Date().toLocaleString()}
