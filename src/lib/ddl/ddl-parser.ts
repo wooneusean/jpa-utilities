@@ -139,43 +139,41 @@ const parseDDL = (ddl: string): JPAField => {
     return jpaField;
 };
 
-export const getTableInfo = (ddlString: string): Promise<JPATable> => {
-    return new Promise((res, rej) => {
-        const tableNameRegExp = /CREATE TABLE `(.+)`/gi;
-        const tableNameMatch = tableNameRegExp.exec(ddlString);
+export const getTableInfo = (ddlString: string): JPATable => {
+    const tableNameRegExp = /CREATE TABLE `(.+)`/gi;
+    const tableNameMatch = tableNameRegExp.exec(ddlString);
 
-        if (tableNameMatch == null) {
-            rej('Cannot find table name!');
+    if (tableNameMatch == null) {
+        throw new SyntaxError('Cannot find table name!');
+    }
+
+    const tableName = tableNameMatch[1];
+
+    const columnRegExp = /(?:`|)([\w\d]+?)(?:`|)\s(\w+?)((?:\(\d+(?:,\d+|)\))|)\s(.+?)(?:,|(?:[\n\r]|)\))/gim;
+
+    const columnList = [];
+    let columnMatch: RegExpExecArray;
+    do {
+        columnMatch = columnRegExp.exec(ddlString);
+        if (columnMatch) {
+            const columnName = columnMatch[1].toLowerCase();
+            if (columnName == 'primary' || columnName == 'create' || columnName == 'unique' || columnName == 'key')
+                continue;
+            columnList.push(columnMatch);
         }
+    } while (columnMatch);
 
-        const tableName = tableNameMatch[1];
+    const jpaColumns = columnList.map((col) => parseDDL(col));
 
-        const columnRegExp = /(?:`|)([\w\d]+?)(?:`|)\s(\w+?)((?:\(\d+(?:,\d+|)\))|)\s(.+?)(?:,|(?:[\n\r]|)\))/gim;
+    const primaryKeyPattern = /PRIMARY KEY \(`(.+)`\)/gi;
+    const primaryKeyMatch = primaryKeyPattern.exec(ddlString);
+    if (primaryKeyMatch != null) {
+        const primaryKey = primaryKeyMatch[1];
+        jpaColumns.find((x) => x.columnName == primaryKey).isPrimary = true;
+    }
 
-        const columnList = [];
-        let columnMatch: RegExpExecArray;
-        do {
-            columnMatch = columnRegExp.exec(ddlString);
-            if (columnMatch) {
-                const columnName = columnMatch[1].toLowerCase();
-                if (columnName == 'primary' || columnName == 'create' || columnName == 'unique' || columnName == 'key')
-                    continue;
-                columnList.push(columnMatch);
-            }
-        } while (columnMatch);
-
-        const jpaColumns = columnList.map((col) => parseDDL(col));
-
-        const primaryKeyPattern = /PRIMARY KEY \(`(.+)`\)/gi;
-        const primaryKeyMatch = primaryKeyPattern.exec(ddlString);
-        if (primaryKeyMatch != null) {
-            const primaryKey = primaryKeyMatch[1];
-            jpaColumns.find((x) => x.columnName == primaryKey).isPrimary = true;
-        }
-
-        res({
-            tableName: tableName,
-            columns: jpaColumns,
-        });
-    });
+    return {
+        tableName: tableName,
+        columns: jpaColumns,
+    };
 };

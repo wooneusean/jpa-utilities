@@ -31,6 +31,7 @@
         'extraAttr',
     ];
 
+    let isLoading = false;
     let currentTabIndex = 0;
     let includeJPAAnnotations = true;
     let includeLombokAnnotations = true;
@@ -65,15 +66,13 @@
     };
 
     const goToRefine = () => {
-        getTableInfo(ddl)
-            .then((t) => {
-                jpaTable = t;
-                selectedColumns = jpaTable.columns.map((col) => col.columnName);
-                changeTab(1);
-            })
-            .catch((error) => {
-                dispatch('message', { message: error.message, type: 'error' });
-            });
+        try {
+            jpaTable = getTableInfo(ddl);
+            selectedColumns = jpaTable.columns.map((col) => col.columnName);
+            changeTab(1);
+        } catch (error) {
+            dispatch('message', { message: error.message, type: 'error' });
+        }
     };
 
     const changeTab = (pageIx) => {
@@ -136,6 +135,9 @@
         </svelte:fragment>
     </Tabs>
 </Row>
+{#if isLoading}
+    <Loading />
+{/if}
 
 <style>
     :global(#pojo-generator .bx--snippet),
