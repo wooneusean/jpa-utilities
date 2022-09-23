@@ -61,6 +61,7 @@ export const generatePojo = (
         .join('\n\n');
 
     const jpaImportsString = [
+        ...(options.includeJPAAnnotations ? ['javax.persistence.Entity', 'javax.persistence.Table'] : []),
         ...new Set(
             jpaTable.columns
                 .reduce((prev, curr, _) => {
