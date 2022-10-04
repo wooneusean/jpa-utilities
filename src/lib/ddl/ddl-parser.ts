@@ -46,6 +46,7 @@ const parseDDL = (ddl: string): JPAField => {
 
     const jpaField: JPAField = {
         columnName: '',
+        columnType: '',
         fieldName: '',
         fieldType: '',
         isNullable: true,
@@ -61,11 +62,12 @@ const parseDDL = (ddl: string): JPAField => {
     };
 
     jpaField.columnName = ddl[1];
+    jpaField.columnType = ddl[2];
     jpaField.fieldName = toCamelCase(ddl[1]);
 
     processExtraAttributes(jpaField, ddl[4]);
 
-    switch (ddl[2].toLowerCase()) {
+    switch (jpaField.columnType) {
         case 'varbinary':
         case 'longvarbinary':
         case 'binary':

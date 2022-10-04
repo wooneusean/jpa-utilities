@@ -1,5 +1,6 @@
 export interface JPAField {
     columnName: string;
+    columnType: String;
     fieldName: string;
     fieldType: string;
     isNullable: boolean;

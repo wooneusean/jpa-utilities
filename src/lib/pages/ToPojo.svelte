@@ -22,7 +22,7 @@
 
     const tableHeaders = [
         'columnName',
-        'fieldType',
+        'columnType',
         'isNullable',
         'isPrimary',
         'isUnique',
