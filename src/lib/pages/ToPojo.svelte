@@ -31,7 +31,6 @@
         'extraAttr',
     ];
 
-    let isLoading = false;
     let currentTabIndex = 0;
     let includeJPAAnnotations = true;
     let includeLombokAnnotations = true;
@@ -61,6 +60,7 @@
                 dispatch('message', { message: warning, type: 'warning' });
             }
         } catch (error) {
+            console.trace(error);
             dispatch('message', { message: error.message, type: 'error' });
         }
     };
@@ -71,6 +71,7 @@
             selectedColumns = jpaTable.columns.map((col) => col.columnName);
             changeTab(1);
         } catch (error) {
+            console.trace(error);
             dispatch('message', { message: error.message, type: 'error' });
         }
     };
@@ -118,6 +119,15 @@
                         length: col.length > -1 ? col.length : '-',
                     }))}
                 >
+                <svelte:fragment slot="cell" let:row let:cell>
+                    <!-- TODO: Handle tinyint and timestamp columns by prompt -->
+                    {#if cell.key == "columnType" && cell.value == "tinyint"}
+                        {cell.value} 
+                    {:else}
+                        {cell.value}
+                    {/if}
+                
+                </svelte:fragment>
                     <Toolbar>
                         <ToolbarContent>
                             <ToolbarSearch persistent value="" shouldFilterRows />
@@ -135,9 +145,6 @@
         </svelte:fragment>
     </Tabs>
 </Row>
-{#if isLoading}
-    <Loading />
-{/if}
 
 <style>
     :global(#pojo-generator .bx--snippet),

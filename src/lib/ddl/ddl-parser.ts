@@ -56,7 +56,7 @@ const parseDDL = (ddl: string): JPAField => {
         isPrimary: false,
         isUnique: false,
         isAutoIncrement: false,
-        defaultValue: null,
+        defaultValue: '',
         imports: [],
         extraAttr: '',
     };
@@ -96,9 +96,10 @@ const parseDDL = (ddl: string): JPAField => {
             jpaField.fieldType = 'Timestamp';
             jpaField.imports.push('java.sql.Timestamp');
             if (jpaField.defaultValue.toLowerCase() == 'current_timestamp') {
-                if (jpaField.columnName.toLowerCase().includes('upd')) {
+                const colName = jpaField.columnName.toLowerCase();
+                if (colName.includes('update')) {
                     jpaField.imports.push('org.hibernate.annotations.UpdateTimestamp');
-                } else if (jpaField.columnName.toLowerCase().includes('creat')) {
+                } else if (colName.includes('create') || colName.includes('insert')) {
                     jpaField.imports.push('org.hibernate.annotations.CreationTimestamp');
                 }
             }
@@ -132,9 +133,11 @@ const parseDDL = (ddl: string): JPAField => {
             break;
         case 'varchar':
         case 'longvarchar':
-        default:
             jpaField.fieldType = 'String';
             jpaField.length = parseInt(jpaTypeValues[0]);
+            break;
+        default:
+            jpaField.fieldType = 'Object';
             break;
     }
 
