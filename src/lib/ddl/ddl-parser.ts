@@ -91,7 +91,7 @@ export const parseDDL = (ddl: string, options: DDLToPOJOOptions): JPAField => {
         case 'time':
             if (options.useNewTimeLibrary === true) {
                 jpaField.fieldType = 'LocalTime';
-                jpaField.imports.push('java.util.LocalTime');
+                jpaField.imports.push('java.time.LocalTime');
             } else {
                 jpaField.fieldType = 'Time';
                 jpaField.imports.push('java.sql.Time');
@@ -101,7 +101,7 @@ export const parseDDL = (ddl: string, options: DDLToPOJOOptions): JPAField => {
         case 'timestamp':
             if (options.useNewTimeLibrary === true) {
                 jpaField.fieldType = 'LocalDateTime';
-                jpaField.imports.push('java.util.LocalDateTime');
+                jpaField.imports.push('java.time.LocalDateTime');
             } else {
                 jpaField.fieldType = 'Timestamp';
                 jpaField.imports.push('java.sql.Timestamp');
@@ -118,7 +118,7 @@ export const parseDDL = (ddl: string, options: DDLToPOJOOptions): JPAField => {
         case 'date':
             if (options.useNewTimeLibrary === true) {
                 jpaField.fieldType = 'LocalDate';
-                jpaField.imports.push('java.util.LocalDate');
+                jpaField.imports.push('java.time.LocalDate');
             } else {
                 jpaField.fieldType = 'Date';
                 jpaField.imports.push('java.sql.Date');
