@@ -2,6 +2,12 @@ import { capitalize, toCamelCase } from '../utilities';
 import { getTableInfo } from './ddl-parser';
 import type { JPAField, JPATable } from './jpa-types';
 
+export interface DDLToPOJOOptions {
+    includeLombokAnnotations: boolean;
+    includeJPAAnnotations: boolean;
+    useNewTimeLibrary: boolean;
+}
+
 const generateJpaString = (jpaField: JPAField, includeJPAAnnotations: boolean = true): string => {
     const fieldDetails = [];
 
@@ -43,14 +49,9 @@ const generateJpaString = (jpaField: JPAField, includeJPAAnnotations: boolean = 
     return fieldDetails.join('\n');
 };
 
-interface DDLToPOJOOptions {
-    includeLombokAnnotations: boolean;
-    includeJPAAnnotations: boolean;
-}
-
 export const generatePojo = (
     jpaTable: JPATable = null,
-    options: DDLToPOJOOptions = { includeJPAAnnotations: true, includeLombokAnnotations: true }
+    options: DDLToPOJOOptions
 ): { pojo: string; warning: string } => {
     // max length 4194304
 

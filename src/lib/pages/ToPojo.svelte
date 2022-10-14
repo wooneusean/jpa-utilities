@@ -15,7 +15,7 @@
         Loading,
     } from 'carbon-components-svelte';
     import { createEventDispatcher } from 'svelte';
-    import { getTableInfo } from '../ddl/ddl-parser';
+    import { getTableInfo, parseDDL } from '../ddl/ddl-parser';
     import { generatePojo } from '../ddl/ddl-to-pojo';
     import type { JPATable } from '../ddl/jpa-types';
     import { unCamelCase } from '../utilities';
@@ -34,6 +34,7 @@
     let currentTabIndex = 0;
     let includeJPAAnnotations = true;
     let includeLombokAnnotations = true;
+    let useNewTimeLibrary = true;
     let ddl = '';
     let pojo = '';
 
@@ -44,6 +45,12 @@
     const dispatch = createEventDispatcher();
 
     const goToPojo = () => {
+        jpaTable = getTableInfo(ddl, {
+            includeJPAAnnotations,
+            includeLombokAnnotations,
+            useNewTimeLibrary,
+        });
+
         const refinedJPATable: JPATable = {
             ...jpaTable,
             columns: jpaTable.columns.filter((col) => selectedColumns.includes(col.columnName)),
@@ -52,6 +59,7 @@
             let { pojo: generated, warning } = generatePojo(refinedJPATable, {
                 includeJPAAnnotations,
                 includeLombokAnnotations,
+                useNewTimeLibrary,
             });
 
             pojo = generated;
@@ -67,7 +75,11 @@
 
     const goToRefine = () => {
         try {
-            jpaTable = getTableInfo(ddl);
+            jpaTable = getTableInfo(ddl, {
+                includeJPAAnnotations,
+                includeLombokAnnotations,
+                useNewTimeLibrary,
+            });
             selectedColumns = jpaTable.columns.map((col) => col.columnName);
             changeTab(1);
         } catch (error) {
@@ -102,6 +114,10 @@
             <TabContent style="width: 100%;">
                 <Checkbox labelText="Include JPA Annotations" bind:checked={includeJPAAnnotations} />
                 <Checkbox labelText="Include Lombok Annotations" bind:checked={includeLombokAnnotations} />
+                <Checkbox
+                    labelText="Use java.time for date and time (recommended)"
+                    bind:checked={useNewTimeLibrary}
+                />
                 <DataTable
                     bind:selectedRowIds={selectedColumns}
                     stickyHeader
@@ -119,15 +135,14 @@
                         length: col.length > -1 ? col.length : '-',
                     }))}
                 >
-                <svelte:fragment slot="cell" let:row let:cell>
-                    <!-- TODO: Handle tinyint and timestamp columns by prompt -->
-                    {#if cell.key == "columnType" && cell.value == "tinyint"}
-                        {cell.value} 
-                    {:else}
-                        {cell.value}
-                    {/if}
-                
-                </svelte:fragment>
+                    <svelte:fragment slot="cell" let:row let:cell>
+                        <!-- TODO: Handle tinyint and timestamp columns by prompt -->
+                        {#if cell.key == 'columnType' && cell.value == 'tinyint'}
+                            {cell.value}
+                        {:else}
+                            {cell.value}
+                        {/if}
+                    </svelte:fragment>
                     <Toolbar>
                         <ToolbarContent>
                             <ToolbarSearch persistent value="" shouldFilterRows />

@@ -1,4 +1,5 @@
 import { toCamelCase } from '../utilities';
+import type { DDLToPOJOOptions } from './ddl-to-pojo';
 import type { JPAField, JPATable } from './jpa-types';
 
 const processExtraAttributes = (jpaField: JPAField, extraAttr: string): JPAField => {
@@ -41,7 +42,7 @@ const processExtraAttributes = (jpaField: JPAField, extraAttr: string): JPAField
     return jpaField;
 };
 
-const parseDDL = (ddl: string): JPAField => {
+export const parseDDL = (ddl: string, options: DDLToPOJOOptions): JPAField => {
     const jpaTypeValues = ddl[3].replace('(', '').replace(')', '').split(',');
 
     const jpaField: JPAField = {
@@ -88,13 +89,23 @@ const parseDDL = (ddl: string): JPAField => {
             jpaField.fieldType = 'Long';
             break;
         case 'time':
-            jpaField.fieldType = 'Time';
-            jpaField.imports.push('java.sql.Time');
+            if (options.useNewTimeLibrary === true) {
+                jpaField.fieldType = 'LocalTime';
+                jpaField.imports.push('java.util.LocalTime');
+            } else {
+                jpaField.fieldType = 'Time';
+                jpaField.imports.push('java.sql.Time');
+            }
             break;
         case 'datetime':
         case 'timestamp':
-            jpaField.fieldType = 'Timestamp';
-            jpaField.imports.push('java.sql.Timestamp');
+            if (options.useNewTimeLibrary === true) {
+                jpaField.fieldType = 'LocalDateTime';
+                jpaField.imports.push('java.util.LocalDateTime');
+            } else {
+                jpaField.fieldType = 'Timestamp';
+                jpaField.imports.push('java.sql.Timestamp');
+            }
             if (jpaField.defaultValue.toLowerCase() == 'current_timestamp') {
                 const colName = jpaField.columnName.toLowerCase();
                 if (colName.includes('update')) {
@@ -105,8 +116,13 @@ const parseDDL = (ddl: string): JPAField => {
             }
             break;
         case 'date':
-            jpaField.fieldType = 'Date';
-            jpaField.imports.push('java.sql.Date');
+            if (options.useNewTimeLibrary === true) {
+                jpaField.fieldType = 'LocalDate';
+                jpaField.imports.push('java.util.LocalDate');
+            } else {
+                jpaField.fieldType = 'Date';
+                jpaField.imports.push('java.sql.Date');
+            }
             break;
         case 'numeric':
         case 'decimal':
@@ -144,7 +160,7 @@ const parseDDL = (ddl: string): JPAField => {
     return jpaField;
 };
 
-export const getTableInfo = (ddlString: string): JPATable => {
+export const getTableInfo = (ddlString: string, options: DDLToPOJOOptions): JPATable => {
     const tableNameRegExp = /CREATE TABLE `(.+)`/gi;
     const tableNameMatch = tableNameRegExp.exec(ddlString);
 
@@ -168,7 +184,7 @@ export const getTableInfo = (ddlString: string): JPATable => {
         }
     } while (columnMatch);
 
-    const jpaColumns = columnList.map((col) => parseDDL(col));
+    const jpaColumns = columnList.map((col) => parseDDL(col, options));
 
     const primaryKeyPattern = /PRIMARY KEY \(`(.+)`\)/gi;
     const primaryKeyMatch = primaryKeyPattern.exec(ddlString);
