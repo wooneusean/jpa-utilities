@@ -191,6 +191,11 @@ export const getTableInfo = (ddlString: string, options: DDLToPOJOOptions): JPAT
     if (primaryKeyMatch != null) {
         const primaryKey = primaryKeyMatch[1];
         jpaColumns.find((x) => x.columnName == primaryKey).isPrimary = true;
+    } else {
+        const hasPrimaryKey = jpaColumns.some(col => col.isPrimary === true);
+        if (!hasPrimaryKey) {
+            throw new SyntaxError("Table does not have a primary key!");
+        }
     }
 
     return {
