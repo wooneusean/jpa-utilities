@@ -1,12 +1,7 @@
+import type DDLToPOJOOptions from '../interfaces/DDLToPOJOOptions';
+import type JPAField from '../interfaces/JPAField';
+import type JPATable from '../interfaces/JPATable';
 import { capitalize, toCamelCase } from '../utilities';
-import { getTableInfo } from './ddl-parser';
-import type { JPAField, JPATable } from './jpa-types';
-
-export interface DDLToPOJOOptions {
-    includeLombokAnnotations: boolean;
-    includeJPAAnnotations: boolean;
-    useNewTimeLibrary: boolean;
-}
 
 const generateJpaString = (jpaField: JPAField, includeJPAAnnotations: boolean = true): string => {
     const fieldDetails = [];

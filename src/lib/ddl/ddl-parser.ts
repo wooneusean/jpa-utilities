@@ -1,6 +1,7 @@
+import type DDLToPOJOOptions from '../interfaces/DDLToPOJOOptions';
+import type JPAField from '../interfaces/JPAField';
+import type JPATable from '../interfaces/JPATable';
 import { toCamelCase } from '../utilities';
-import type { DDLToPOJOOptions } from './ddl-to-pojo';
-import type { JPAField, JPATable } from './jpa-types';
 
 const processExtraAttributes = (jpaField: JPAField, extraAttr: string): JPAField => {
     let extraAttrList = extraAttr.trim().split(' ');

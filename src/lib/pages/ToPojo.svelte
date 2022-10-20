@@ -12,12 +12,11 @@
         Toolbar,
         ToolbarContent,
         ToolbarSearch,
-        Loading,
     } from 'carbon-components-svelte';
     import { createEventDispatcher } from 'svelte';
     import { getTableInfo, parseDDL } from '../ddl/ddl-parser';
     import { generatePojo } from '../ddl/ddl-to-pojo';
-    import type { JPATable } from '../ddl/jpa-types';
+    import type JPATable from '../interfaces/JPATable';
     import { unCamelCase } from '../utilities';
 
     const tableHeaders = [

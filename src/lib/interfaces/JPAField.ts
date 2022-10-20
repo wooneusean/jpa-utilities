@@ -1,4 +1,4 @@
-export interface JPAField {
+export default interface JPAField {
     columnName: string;
     columnType: String;
     fieldName: string;
@@ -13,14 +13,4 @@ export interface JPAField {
     defaultValue?: string;
     imports: string[];
     extraAttr: string;
-}
-
-export interface JPATable {
-    tableName: string;
-    columns: JPAField[];
-}
-
-export interface ToastMessage {
-    message: string;
-    type: 'warning' | 'error' | 'info' | 'info-square' | 'success' | 'warning-alt';
 }

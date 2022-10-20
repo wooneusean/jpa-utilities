@@ -10,7 +10,8 @@
         Grid,
         ToastNotification,
     } from 'carbon-components-svelte';
-    import type { ToastMessage } from './lib/ddl/jpa-types';
+    import type ToastMessage from './lib/interfaces/ToastMessage';
+    import ColumnValueCompare from './lib/pages/ColumnValueCompare.svelte';
     import ToEntityManager from './lib/pages/ToEntityManager.svelte';
     import ToPojo from './lib/pages/ToPojo.svelte';
     import { capitalize } from './lib/utilities';
@@ -35,8 +36,9 @@
 <SideNav bind:isOpen={isSideNavOpen}>
     <SideNavItems>
         <SideNavMenu expanded={true} text="Generators">
-            <SideNavMenuItem text="POJO" on:click={() => (currentPage = 0)} />
+            <SideNavMenuItem text="POJO Generator" on:click={() => (currentPage = 0)} />
             <SideNavMenuItem text="EntityManager Statements" on:click={() => (currentPage = 1)} />
+            <SideNavMenuItem text="Column to Value Comparer" on:click={() => (currentPage = 2)} />
         </SideNavMenu>
     </SideNavItems>
 </SideNav>
@@ -45,8 +47,10 @@
     <Grid>
         {#if currentPage == 0}
             <ToPojo on:message={handleMessage} />
-        {:else}
+        {:else if currentPage == 1}
             <ToEntityManager on:message={handleMessage} />
+        {:else if currentPage == 2}
+            <ColumnValueCompare on:message={handleMessage} />
         {/if}
     </Grid>
 </Content>

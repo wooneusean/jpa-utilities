@@ -9,7 +9,11 @@
     // const dispatch = createEventDispatcher();
 
     const handleProcessClicked = () => {
-        em = generateEm(ddl);
+        em = generateEm(ddl, {
+            includeJPAAnnotations: false,
+            includeLombokAnnotations: false,
+            useNewTimeLibrary: false,
+        });
     };
 </script>
 
