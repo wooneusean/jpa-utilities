@@ -107,13 +107,11 @@ export const parseDDL = (ddl: string, options: DDLToPOJOOptions): JPAField => {
                 jpaField.fieldType = 'Timestamp';
                 jpaField.imports.push('java.sql.Timestamp');
             }
-            if (jpaField.defaultValue.toLowerCase() == 'current_timestamp') {
-                const colName = jpaField.columnName.toLowerCase();
-                if (colName.includes('update')) {
-                    jpaField.imports.push('org.hibernate.annotations.UpdateTimestamp');
-                } else if (colName.includes('create') || colName.includes('insert')) {
-                    jpaField.imports.push('org.hibernate.annotations.CreationTimestamp');
-                }
+            const colName = jpaField.columnName.toLowerCase();
+            if (colName.includes('update')) {
+                jpaField.imports.push('org.hibernate.annotations.UpdateTimestamp');
+            } else if (colName.includes('create') || colName.includes('insert')) {
+                jpaField.imports.push('org.hibernate.annotations.CreationTimestamp');
             }
             break;
         case 'date':
@@ -193,9 +191,9 @@ export const getTableInfo = (ddlString: string, options: DDLToPOJOOptions): JPAT
         const primaryKey = primaryKeyMatch[1];
         jpaColumns.find((x) => x.columnName == primaryKey).isPrimary = true;
     } else {
-        const hasPrimaryKey = jpaColumns.some(col => col.isPrimary === true);
+        const hasPrimaryKey = jpaColumns.some((col) => col.isPrimary === true);
         if (!hasPrimaryKey) {
-            throw new SyntaxError("Table does not have a primary key!");
+            throw new SyntaxError('Table does not have a primary key!');
         }
     }
 
