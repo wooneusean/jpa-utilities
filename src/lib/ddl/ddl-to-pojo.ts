@@ -13,8 +13,17 @@ const generateJpaString = (jpaField: JPAField, includeJPAAnnotations: boolean = 
         const precField = jpaField.precision > 0 ? `precision = ${jpaField.precision}` : '';
         const scaleField = jpaField.scale > 0 ? `scale = ${jpaField.scale}` : '';
         const uniqueField = jpaField.isUnique ? 'unique = true' : '';
+        const defaultField = jpaField.defaultValue ? `columnDefinition = "DEFAULT ${jpaField.defaultValue}"` : '';
 
-        const combinedFields = [stringField, nullableField, lengthField, precField, scaleField, uniqueField]
+        const combinedFields = [
+            stringField,
+            nullableField,
+            lengthField,
+            precField,
+            scaleField,
+            uniqueField,
+            defaultField,
+        ]
             .filter((x) => x)
             .join(', ');
 
