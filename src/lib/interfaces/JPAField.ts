@@ -13,4 +13,5 @@ export default interface JPAField {
     defaultValue?: string;
     imports: string[];
     extraAttr: string;
+    annotations: string[];
 }

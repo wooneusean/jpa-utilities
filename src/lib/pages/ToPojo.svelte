@@ -34,6 +34,7 @@
     let includeJPAAnnotations = true;
     let includeLombokAnnotations = true;
     let useNewTimeLibrary = true;
+    let includeColumnDefinition = false;
     let ddl = '';
     let pojo = '';
 
@@ -48,6 +49,7 @@
             includeJPAAnnotations,
             includeLombokAnnotations,
             useNewTimeLibrary,
+            includeColumnDefinition,
         });
 
         const refinedJPATable: JPATable = {
@@ -59,6 +61,7 @@
                 includeJPAAnnotations,
                 includeLombokAnnotations,
                 useNewTimeLibrary,
+                includeColumnDefinition,
             });
 
             pojo = generated;
@@ -78,6 +81,7 @@
                 includeJPAAnnotations,
                 includeLombokAnnotations,
                 useNewTimeLibrary,
+                includeColumnDefinition,
             });
             selectedColumns = jpaTable.columns.map((col) => col.columnName);
             changeTab(1);
@@ -113,9 +117,10 @@
             <TabContent style="width: 100%;">
                 <Checkbox labelText="Include JPA Annotations" bind:checked={includeJPAAnnotations} />
                 <Checkbox labelText="Include Lombok Annotations" bind:checked={includeLombokAnnotations} />
+                <Checkbox labelText="Use java.time for date and time (recommended)" bind:checked={useNewTimeLibrary} />
                 <Checkbox
-                    labelText="Use java.time for date and time (recommended)"
-                    bind:checked={useNewTimeLibrary}
+                    labelText="Include 'columnDefinition' argument in @Column annotation."
+                    bind:checked={includeColumnDefinition}
                 />
                 <DataTable
                     bind:selectedRowIds={selectedColumns}

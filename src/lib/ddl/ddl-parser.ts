@@ -61,6 +61,7 @@ export const parseDDL = (ddl: string, options: DDLToPOJOOptions): JPAField => {
         defaultValue: '',
         imports: [],
         extraAttr: '',
+        annotations: [],
     };
 
     jpaField.columnName = ddl[1];
@@ -146,6 +147,9 @@ export const parseDDL = (ddl: string, options: DDLToPOJOOptions): JPAField => {
         case 'char':
             jpaField.fieldType = 'Character';
             break;
+        case 'longtext':
+            jpaField.annotations.push('@Lob');
+            jpaField.imports.push('javax.persistence.Lob');
         case 'varchar':
         case 'longvarchar':
             jpaField.fieldType = 'String';

@@ -3,31 +3,28 @@ import type JPAField from '../interfaces/JPAField';
 import type JPATable from '../interfaces/JPATable';
 import { capitalize, toCamelCase } from '../utilities';
 
-const generateJpaString = (jpaField: JPAField, includeJPAAnnotations: boolean = true): string => {
+const generateJpaString = (jpaField: JPAField, options: DDLToPOJOOptions): string => {
     const fieldDetails = [];
 
-    if (includeJPAAnnotations === true) {
-        const stringField = `name = "${jpaField.columnName}"`;
-        const nullableField = jpaField.isNullable == false ? `nullable = false` : '';
-        const lengthField = jpaField.length > -1 ? `length = ${jpaField.length}` : '';
-        const precField = jpaField.precision > 0 ? `precision = ${jpaField.precision}` : '';
-        const scaleField = jpaField.scale > 0 ? `scale = ${jpaField.scale}` : '';
-        const uniqueField = jpaField.isUnique ? 'unique = true' : '';
-        const defaultField = jpaField.defaultValue ? `columnDefinition = "DEFAULT ${jpaField.defaultValue}"` : '';
+    if (options.includeJPAAnnotations === true) {
+        const combinedFields = [];
 
-        const combinedFields = [
-            stringField,
-            nullableField,
-            lengthField,
-            precField,
-            scaleField,
-            uniqueField,
-            defaultField,
-        ]
-            .filter((x) => x)
-            .join(', ');
+        combinedFields.push(`name = "${jpaField.columnName}"`);
+        combinedFields.push(jpaField.isNullable == false ? `nullable = false` : '');
+        combinedFields.push(jpaField.length > -1 ? `length = ${jpaField.length}` : '');
+        combinedFields.push(jpaField.precision > 0 ? `precision = ${jpaField.precision}` : '');
+        combinedFields.push(jpaField.scale > 0 ? `scale = ${jpaField.scale}` : '');
+        combinedFields.push(jpaField.isUnique ? 'unique = true' : '');
 
-        fieldDetails.push(`    @Column(${combinedFields})`);
+        if (options.includeColumnDefinition === true) {
+            combinedFields.push(jpaField.defaultValue ? `columnDefinition = "DEFAULT ${jpaField.defaultValue}"` : '');
+        }
+
+        let annotationFieldsStr = combinedFields.filter((x) => x !== '').join(', ');
+
+        jpaField.annotations.forEach((ann) => fieldDetails.push(`    ${ann}`));
+
+        fieldDetails.push(`    @Column(${annotationFieldsStr})`);
         jpaField.imports.push('javax.persistence.Column');
 
         if (jpaField.isAutoIncrement) {
@@ -62,7 +59,7 @@ export const generatePojo = (
     // Move primary key to the top
     const jpaColumnsString = jpaTable.columns
         .sort((a, b) => (a.isPrimary ? -1 : b.isPrimary ? 1 : 0))
-        .map((col) => generateJpaString(col, options.includeJPAAnnotations))
+        .map((col) => generateJpaString(col, options))
         .join('\n\n');
 
     const jpaImportsString = [
