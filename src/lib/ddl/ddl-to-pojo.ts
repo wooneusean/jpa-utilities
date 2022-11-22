@@ -84,7 +84,7 @@ ${options.includeLombokAnnotations === true ? '@Data' : ''}
 ${
     options.includeJPAAnnotations === true
         ? `@Entity
-@Table(name = "${jpaTable.tableName}")`
+@Table(name = "${jpaTable.tableName.toUpperCase()}")`
         : ''
 }
 public class ${capitalize(toCamelCase(jpaTable.tableName))} implements Serializable {
