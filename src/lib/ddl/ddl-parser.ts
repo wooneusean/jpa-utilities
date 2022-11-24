@@ -153,7 +153,8 @@ export const parseDDL = (ddl: string, options: DDLToPOJOOptions): JPAField => {
         case 'varchar':
         case 'longvarchar':
             jpaField.fieldType = 'String';
-            jpaField.length = parseInt(jpaTypeValues[0]);
+            const strLen = parseInt(jpaTypeValues[0]);
+            jpaField.length = strLen === 255 ? -1 : strLen;
             break;
         default:
             jpaField.fieldType = 'Object';
