@@ -12,6 +12,9 @@
         Toolbar,
         ToolbarContent,
         ToolbarSearch,
+        Link,
+        Modal,
+        ImageLoader,
     } from 'carbon-components-svelte';
     import { createEventDispatcher } from 'svelte';
     import { getTableInfo, parseDDL } from '../ddl/ddl-parser';
@@ -37,6 +40,7 @@
     let includeColumnDefinition = false;
     let ddl = '';
     let pojo = '';
+    let showHelp = false;
 
     let jpaTable: JPATable;
     $: jpaTableColumns = jpaTable?.columns ?? [];
@@ -112,7 +116,21 @@
                     bind:value={ddl}
                     rows={20}
                 />
-                <Button style="margin-block: 1rem;" on:click={goToRefine}>Next</Button>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <Button style="margin-block: 1rem;" on:click={goToRefine}>Next</Button>
+                    <Link title="Show usage guide" on:click={() => (showHelp = true)}>?</Link>
+                    <Modal
+                        bind:open={showHelp}
+                        modalHeading="Usage Guide"
+                        primaryButtonText="Confirm"
+                        on:click:button--primary={() => (showHelp = false)}
+                        on:open
+                        on:close
+                        on:submit
+                    >
+                        <ImageLoader src="images/how-to-pojo.gif" />
+                    </Modal>
+                </div>
             </TabContent>
             <TabContent style="width: 100%;">
                 <Checkbox labelText="Include JPA Annotations" bind:checked={includeJPAAnnotations} />
